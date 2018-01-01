@@ -60,6 +60,7 @@ int main(void)
             exit(0);
             close(connfd);
         }
+        // TODO: close listenfd when get signal
         close(connfd);
     }
 

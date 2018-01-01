@@ -5,6 +5,19 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <iostream>
+extern ssize_t writen(int fd, const void *vptr, size_t n);
+
+void str_echo(int sockfd)
+{
+    ssize_t n;
+    char buf[100];
+    while ((n = read(sockfd, buf, 100)) >0) {
+        writen(sockfd, buf, n);
+    }
+    if (n <0) {
+        std::cout << "error:" << n << std::endl;
+    }
+}
 
 int main(void)
 {
@@ -43,7 +56,9 @@ int main(void)
         std::cout << "x:" << connfd <<std::endl;
         if ((childpid = fork()) == 0) {
             close(listenfd);
+            str_echo(connfd);
             exit(0);
+            close(connfd);
         }
         close(connfd);
     }

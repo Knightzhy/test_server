@@ -13,6 +13,7 @@
 
 int main ()
 {
+    int ret;
     // create socket fd
     int listening_fd;
     listening_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -22,13 +23,21 @@ int main ()
     }
     printf ("success to create socket fd [%d]\n", listening_fd);
 
+    // set socketopt
+    int reuseaddr = 1;
+    ret = setsockopt(listening_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&reuseaddr, sizeof(reuseaddr));
+    if (ret < 0) {
+        printf("When setsockopt reuseaddr, there is a wrong, errno:%d,%s\n", errno,strerror(errno));
+        return 0;
+    }
+
     // bind addr
     sockaddr_in server_addr;
     bzero(&server_addr, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(5555);
+    server_addr.sin_port = htons(55555);
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-    int ret = bind (listening_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
+    ret = bind (listening_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
     if ( ret < 0 ) {
         printf("When bind socket_fd and address, there is a wrong. errno:%d\n", ret);
         return 0;
@@ -55,10 +64,12 @@ int main ()
     printf ("accept a linkage [%d], ip[%s], port[%d]\n",
             linkage_fd, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
+
+    sleep(5);
     // close linkage fd
-    shutdown(linkage_fd, 2);
+    close(linkage_fd);
 
     // close listening fd
-    shutdown(listening_fd, 2);
+    close(listening_fd);
     return 0;
 }

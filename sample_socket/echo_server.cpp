@@ -64,6 +64,11 @@ int main ()
     printf ("accept a linkage [%d], ip[%s], port[%d]\n",
             linkage_fd, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
+    // write data
+    char buff[100] = "hahahahha";
+    ssize_t count = write(linkage_fd, &buff, sizeof(buff));
+    printf("When write, count=%d.\n", (int)count);
+
 
     sleep(5);
     // close linkage fd

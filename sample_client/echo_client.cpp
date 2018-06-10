@@ -23,7 +23,7 @@ int main()
     sockaddr_in server_addr;
     bzero(&server_addr, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(5555);
+    server_addr.sin_port = htons(55555);
     inet_pton(AF_INET, "0.0.0.0", &server_addr.sin_addr);
     int ret = connect(socket_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
     if (ret < 0) {
@@ -31,6 +31,11 @@ int main()
         return 0;
     }
     printf("connect success.\n");
-    shutdown(socket_fd, 2);
+
+    // read data
+    char buff[100];
+    ssize_t count = read(socket_fd, &buff, 100);
+    printf("When read, count=%d, string=%s.\n", (int)count, buff);
+    close(socket_fd);
     return 0;
 }

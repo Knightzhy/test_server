@@ -8,6 +8,14 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
+
+int set_nonblockint(int fd) {
+    int flags;
+    if ((flags = fcntl(fd, F_GETFL, 0))== -1){
+        flags = 0;
+    }
+    return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+}
 int main()
 {
     // create socket

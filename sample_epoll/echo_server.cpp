@@ -50,7 +50,7 @@ int main ()
         printf("When listen to the socket, there is a wrong.\n");
         return 0;
     }
-    printf ("listen success]n");
+    printf ("listen success\n");
 
     // create epoll
     int epoll_fd = epoll_create(1000);
@@ -59,7 +59,7 @@ int main ()
     ev.events= EPOLLIN | EPOLLET;
     ev.data.fd = listening_fd;
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listening_fd, &ev) < 0) {
-        printf("epoll error, errno:%d\n", errno);
+        printf("epoll add listening_fd error, errno:%d\n", errno);
         return 0;
     }
     int wait_fds;
@@ -84,21 +84,36 @@ int main ()
                 printf ("accept a linkage [%d], ip[%s], port[%d]\n",
                         linkage_fd, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
+                ev.events= EPOLLIN | EPOLLET;
+                ev.data.fd = linkage_fd;
+                if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, linkage_fd, &ev) < 0) {
+                    printf("epoll add linkage_fd error, errno:%d\n", errno);
+                    return 0;
+                }
 
-                // write data
-                char buff[50] = "hahahahha";
-                ssize_t count = write(linkage_fd, &buff, sizeof(buff));
-                printf("When write, count=%d.\n", (int)count);
-
-                sleep(1);
-                // close linkage fd
-                close(linkage_fd);
-
-                break;
+                cur_fds++;
+                continue;
             }
+            char buff[50];
+            ssize_t count;
+            count = read(evs[i].data.fd, &buff, 50);
+            if (count<=0) {
+                printf("read error, %d.\n", (int)count);
+                close(evs[i].data.fd);
+                epoll_ctl(epoll_fd, EPOLL_CTL_DEL, evs[i].data.fd, &ev);
+                cur_fds--;
+                continue;
+            }
+
+            // write data
+            char buff2[100] = "hahahahha";
+            strncat(buff2, buff, sizeof(buff));
+            count = write(evs[i].data.fd, &buff2, sizeof(buff2));
+            printf("When write, count=%d.\n", (int)count);
+
         }
     }
-
+    close(epoll_fd);
 
     // close listening fd
     close(listening_fd);

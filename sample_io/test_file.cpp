@@ -7,11 +7,11 @@
 // ssize_t write(int fd, const void *vptr, size_t n);
 ssize_t writen(int fd, const void *vptr, size_t n)
 {
+    printf("n=%d\n", n);
     size_t nleft = n;
     const void * nptr = vptr;
     ssize_t nwriten;
     while(nleft >0) {
-        printf("writen.n=%s, nleft=%d.\n", nptr, (int)nleft);
         nwriten = write(fd, nptr, nleft);
         printf("writen.n=%d.\n", (int)nwriten);
         if (nwriten <=0) {
@@ -33,15 +33,22 @@ TEST(IOTest, TWriten)
     int fd = open("aa", O_CREAT | O_APPEND | O_RDWR, S_IRUSR | S_IWUSR);
     ASSERT_GT(fd, 0);
     printf("fd=%d.\n", fd);
-    char v[] = "sdkqoweiqsdsfa";
+    char *v = new char[100000000];
+    for (int i=0; i<100000001; i++) {
+        v[i] = 'a';
+    }
+    v[100000000] = '\0';
     ssize_t n = writen(fd, v, strlen(v));
     ASSERT_EQ(n, strlen(v));
-    printf("n=%d.\n", (int)n);
+    delete []v;
 
     close(fd);
 }
 
 // ssize_t read(int fd, void *buf, size_t nbytes);
+ssize_t readn(int fd, void *buf, size_t n)
+{
+}
 
 
 

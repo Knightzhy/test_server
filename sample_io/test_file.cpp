@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <unistd.h>
+#include <error.h>
 // ssize_t write(int fd, const void *vptr, size_t n);
 ssize_t writen(int fd, const void *vptr, size_t n)
 {
@@ -14,6 +15,7 @@ ssize_t writen(int fd, const void *vptr, size_t n)
         nwriten = write(fd, nptr, nleft);
         printf("writen.n=%d.\n", (int)nwriten);
         if (nwriten <=0) {
+            printf("errno=%d,error=%s.\n", errno, strerror(errno));
             if (nwriten <0 && errno == EINTR) {
                 nwriten = 0;
             } else {
@@ -28,11 +30,12 @@ ssize_t writen(int fd, const void *vptr, size_t n)
 
 TEST(IOTest, TWriten)
 {
-    int fd = open("aa", O_CREAT | O_APPEND, S_IRUSR | S_IWUSR);
+    int fd = open("aa", O_CREAT | O_APPEND | O_RDWR, S_IRUSR | S_IWUSR);
     ASSERT_GT(fd, 0);
     printf("fd=%d.\n", fd);
     char v[] = "sdkqoweiqsdsfa";
     ssize_t n = writen(fd, v, strlen(v));
+    ASSERT_EQ(n, strlen(v));
     printf("n=%d.\n", (int)n);
 
     close(fd);

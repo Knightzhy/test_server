@@ -54,7 +54,7 @@ int main()
         return 0;
    }
     char buff[100] = "Hello World.";
-    ssize_t count = write(socket_fd, &buff, sizeof(buff));
+    ssize_t count = write(socket_fd, &buff, strlen(buff));
     while(true) {
         int wait_fds = epoll_wait(epoll_fd, evs,1, -1);
         if (wait_fds <= -1) {

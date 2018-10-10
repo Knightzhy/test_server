@@ -15,13 +15,16 @@ int main()
     if (pid == 0) {
         printf("This is a children process, pid=%d, parent id=%d\n",
                 getpid(), getppid());
+        sleep(10);
+        printf("child exit.\n");
     }
     if (pid >0) {
         printf("This is a father process, pid=%d, parent id=%d\n",
                 getpid(), getppid());
-        pid_t cpid = wait(NULL);
-        printf("This is a father parcess, pid=%d, my child is dead, his pid=%d\n",
-                getpid(), cpid);
+       // pid_t cpid = wait(NULL);
+        //printf("This is a father parcess, pid=%d, my child is dead, his pid=%d\n",
+         //       getpid(), cpid);
+        printf("father exit.\n");
     }
     return 0;
 }

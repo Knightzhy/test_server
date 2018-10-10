@@ -72,7 +72,6 @@ int main()
         break;
     }
 
-    sleep(10);
     close(epoll_fd);
     close(socket_fd);
     return 0;

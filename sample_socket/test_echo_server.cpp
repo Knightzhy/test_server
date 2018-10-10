@@ -10,6 +10,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+void echo(int linkage_fd)
+{
+    // write data
+    char buff[50];
+    ssize_t count = read(linkage_fd, &buff, 50);
+    printf("When read, count=%d, buff=%s.\n", (int)count, buff);
+
+    char buff2[50] = "MMMMMMMJJJ";
+    count = write(linkage_fd, buff2, strlen(buff2));
+    printf("When write, count=%d.\n", (int)count);
+}
 
 int main ()
 {
@@ -64,19 +75,9 @@ int main ()
     printf ("accept a linkage [%d], ip[%s], port[%d]\n",
             linkage_fd, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
-    // write data
-    char buff[50];
-    ssize_t count = read(linkage_fd, &buff, 50);
-    printf("When read, count=%d, buff=%s.\n", (int)count, buff);
+    echo(linkage_fd);
 
-    char buff2[50] = "MMMMMMMJJJ";
-    count = write(linkage_fd, buff2, strlen(buff2));
-    printf("When write, count=%d.\n", (int)count);
-
-
-    // close linkage fd
     close(linkage_fd);
-
 
     // close listening fd
     close(listening_fd);

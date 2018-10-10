@@ -22,5 +22,10 @@ int main()
     free(a);
     a = NULL;
 
+    char *v = new char[100]();
+    strncpy(v, "sdkqki", 6);
+    printf("v=%s\n", v);
+    delete []v;
+
     return 0;
 }

@@ -1,7 +1,7 @@
 
 CPPFLAGS += -DGTEST_USE_OWN_TR1_TUPLE=0
 
-TARGET = echo_server
+TARGET = bin
 
 MODULEROOT = ../..
 
@@ -28,7 +28,7 @@ prefix = /usr
 EXTRA_INSTALLS =
 CROSS_COMPILE=
 
-GOAL = $(EXECUTABLE)
-GOALd = $(EXECUTABLEd)
+GOAL = $(TEST)
+GOALd = $(TESTd)
 
 include ../../flinter/include.mk

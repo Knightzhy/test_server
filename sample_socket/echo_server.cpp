@@ -65,15 +65,18 @@ int main ()
             linkage_fd, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
 
     // write data
-    char buff[50] = "hahahahha";
-    ssize_t count = write(linkage_fd, &buff, sizeof(buff));
+    char buff[50];
+    ssize_t count = read(linkage_fd, &buff, 50);
+    printf("When read, count=%d, buff=%s.\n", (int)count, buff);
+
+    char buff2[50] = "MMMMMMMJJJ";
+    count = write(linkage_fd, buff2, strlen(buff2));
     printf("When write, count=%d.\n", (int)count);
 
 
     // close linkage fd
     close(linkage_fd);
 
-    sleep(15);
 
     // close listening fd
     close(listening_fd);

@@ -83,29 +83,30 @@ int main ()
             printf("fork error.\n");
             return 0;
         }
-        if (pid ==0) {
-            printf("child pid=%d\n", (int)getpid());
-            close(listening_fd);
-            pid =fork();
-            if (pid <0) {
-                close(linkage_fd);
-                exit(1);
-            }
-            if (pid >0) {
-                printf("child pid=%d, grand son pid=%d\n", (int)getpid(), (int)pid);
-                close(linkage_fd);
-                exit(0);
-            } else {
-                printf("grand son pid=%d\n", (int)getpid());
-                echo(linkage_fd);
-                close(linkage_fd);
-                exit(0);
-            }
+        if (pid >0) {
+            waitpid(pid, NULL, 0);
+            printf("grand father pid=%d, child pid=%d\n", (int)getpid(), (int)pid);
+            close(linkage_fd);
+            continue;
         }
-        waitpid(pid, NULL, 0);
 
-        printf("grand father pid=%d, child pid=%d\n", (int)getpid(), (int)pid);
-        close(linkage_fd);
+        printf("child pid=%d\n", (int)getpid());
+        close(listening_fd);
+        pid =fork();
+        if (pid <0) {
+            close(linkage_fd);
+            exit(1);
+        }
+        if (pid >0) {
+            printf("child pid=%d, grand son pid=%d\n", (int)getpid(), (int)pid);
+            close(linkage_fd);
+            exit(0);
+        } else {
+            printf("grand son pid=%d\n", (int)getpid());
+            echo(linkage_fd);
+            close(linkage_fd);
+            exit(0);
+        }
     }
 
     // close listening fd

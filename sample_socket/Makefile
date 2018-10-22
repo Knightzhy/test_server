@@ -1,3 +1,5 @@
+DisableStackProtector = 1
+ReleaseAsDebug = 1
 
 CPPFLAGS += -DGTEST_USE_OWN_TR1_TUPLE=0
 

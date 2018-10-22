@@ -12,14 +12,14 @@
 #include <unistd.h>
 void echo(int linkage_fd)
 {
-    // write data
-    char buff[50];
-    ssize_t count = read(linkage_fd, &buff, 50);
-    printf("When read, count=%d, buff=%s.\n", (int)count, buff);
-
+    ssize_t count;
     char buff2[50] = "MMMMMMMJJJ";
     count = write(linkage_fd, buff2, strlen(buff2));
     printf("When write, count=%d.\n", (int)count);
+
+    char buff[50];
+    count = read(linkage_fd, &buff, 50);
+    printf("When read, count=%d, buff=%s.\n", (int)count, buff);
 }
 
 int main ()

@@ -13,7 +13,7 @@ SUBDIRS = .
 
 STATICS =
 
-LIBRARIES =
+LIBRARIES = pthread
 
 PKGCONFIGS =
 

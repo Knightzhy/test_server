@@ -252,7 +252,10 @@ TEST(ST, M)
     printf("e=%s\tpoint=%p\n", e, e);
     uint8_t *f = (uint8_t *)a;
     printf("f=%s\tpoint=%p\n", f, f);
-    // TODO: why
+    uint64_t g = (uint64_t)a;
+    printf("g=%s\tpoint=%p\n", (char *)g, (char *)g);
+    void * h = (void *)a;
+    printf("h=%s\tpoint=%p\n", h, h);
 }
 
 

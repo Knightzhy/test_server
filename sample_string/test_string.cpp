@@ -11,6 +11,7 @@
     char *d;
     char *e[];
     char f[][];
+    char *g[][];
     const char *
     char * const
     static char *
@@ -113,6 +114,7 @@ TEST(ST, E)
 {
     char *a;
     a = "ABC";
+    // a[1] = 'E'; // Segmentation fault
     std::cout << "a.length" << strlen(a)
         << "    a.sizeof=" << sizeof(a)
         << "    a[0]=" << a[0]
@@ -121,7 +123,138 @@ TEST(ST, E)
         << "    &a[0]=" << &a[1]
         << "    a+1=" << a+1
         << std::endl;
+    printf("%p    %p    %p\n", a, &a[1], &a);
+    a = (char *)malloc(sizeof(char) * 50);
+    strcpy(a, "Hello World,Yes");
+    std::cout << a << std::endl;
+    free(a);
+    a = NULL;
 }
+
+TEST(ST, F)
+{
+    char *a[10];
+    memset(a, 0, 10);
+    printf("%p\n", a);
+    a[0] = "ANCBs";
+    printf("%p   %p   %s\n", &a[0], a[0], a[0]);
+}
+
+TEST(ST, G)
+{
+    char a[4][5] = {
+                    {'a','b','c','d','e'},
+                    {'f','g','h','i','j'},
+                    {'k','l','m','n','o'},
+                    {'p','q','r','s','t'},
+                    };
+    for (int i=0; i<4; i++) {
+        for (int j=0; j<5; j++) {
+            printf("%c\t", a[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+TEST(ST, H)
+{
+    char *a[4][5] = {
+                    {"aA","bB","cC","dD","eE"},
+                    {"fF","gG","hH","iI","jJ"},
+                    {"kK","lL","mM","nN","oO"},
+                    {"pP","qQ","rR","sS","tT"},
+                    };
+    for (int i=0; i<4; i++) {
+        for (int j=0; j<5; j++) {
+            printf("%s\t", a[i][j]);
+        }
+        printf("\n");
+    }
+}
+TEST(ST, I)
+{
+    const char *a;
+    a = "AXS";
+    printf("a=%s\n", a);
+    a = "BBB";
+    printf("a=%s\n", a);
+    char b[] = "KKKK";
+    a = b;
+    printf("a=%s, b=%s\n", a, b);
+
+    /*
+     * assignment of read-only location ‘*(a + 1u)’
+     *
+     * a[1] = 'M';
+     * printf("a=%s\n", a);
+    */
+
+    char *c;
+    c = b;
+    c[1] = 'M';
+    printf("a=%s, b=%s, c=%s\n", a, b, c);
+
+    /*
+     * assignment of read-only variable ‘d’
+     *
+     * char * const d;
+     * d = b;
+     * */
+
+    char * const d = b;
+    d[2] = 'L';
+    printf("a=%s, b=%s, c=%s, d=%s\n", a, b, c, d);
+}
+
+static char *a;
+
+TEST(ST, J)
+{
+    a = "ABC";
+    printf("a=%s\n", a);
+}
+
+TEST(ST, K)
+{
+    printf("a=%s\n", a);
+}
+
+TEST(ST, L)
+{
+    char a[4][5] = {
+                    {'a','b','c','d','e'},
+                    {'f','g','h','i','j'},
+                    {'k','l','m','n','o'},
+                    {'p','q','r','s','t'},
+                    };
+    printf("a point=%p\n", a);
+    for (int i=0; i<4; i++) {
+        printf("a[%d] point=%p\n", i, &a[i]);
+        for (int j=0; j<5; j++) {
+            printf("a[%d][%d] point=%p\n", i, j, &a[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+TEST(ST, M)
+{
+    char * a;
+    a = "ABCND";
+    printf("a=%s\tpoint=%p\n", a, a);
+    void *b = (void *)a;
+    printf("b=%s\tpoint=%p\n", b, b);
+    int *c = (int *)a;
+    printf("c=%s\tpoint=%p\n", c, c);
+    uint32_t *d = (uint32_t *)a;
+    printf("d=%s\tpoint=%p\n", d, d);
+    uint16_t *e = (uint16_t *)a;
+    printf("e=%s\tpoint=%p\n", e, e);
+    uint8_t *f = (uint8_t *)a;
+    printf("f=%s\tpoint=%p\n", f, f);
+    // TODO: why
+}
+
 
 int main(int argc, char *argv[])
 {

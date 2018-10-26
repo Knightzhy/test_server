@@ -1,7 +1,9 @@
+DisableStackProtector = 1
+ReleaseAsDebug = 1
 
 CPPFLAGS += -DGTEST_USE_OWN_TR1_TUPLE=0
 
-TARGET = echo_client
+TARGET = bin
 
 MODULEROOT = ../..
 
@@ -11,7 +13,7 @@ SUBDIRS = .
 
 STATICS =
 
-LIBRARIES =
+LIBRARIES = pthread gtest gtest_main
 
 PKGCONFIGS =
 
@@ -28,7 +30,7 @@ prefix = /usr
 EXTRA_INSTALLS =
 CROSS_COMPILE=
 
-GOAL = $(EXECUTABLE)
-GOALd = $(EXECUTABLEd)
+GOAL = $(TEST)
+GOALd = $(TESTd)
 
 include ../../flinter/include.mk

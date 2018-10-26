@@ -23,7 +23,9 @@ ssize_t Rpc::GetMessageLength(const void *buffer, size_t length)
 
 size_t Rpc::GetMessageLength(const std::string &msg)
 {
-    return sizeof(Message) + sizeof(msg.c_str());
+    printf("message=%d, msg.length=%d\n",
+            (int)sizeof(Message), strlen(msg.c_str()));
+    return sizeof(Message) + strlen(msg.c_str());
 }
 
 size_t Rpc::GetHeader()

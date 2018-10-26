@@ -27,9 +27,12 @@ ssize_t write_string(int fd)
 
 ssize_t read_string(int fd)
 {
-    char buff2[100];
-    ssize_t count = read(fd, &buff2, 100);
-    printf("When read, count=%d, string=%s.\n", (int)count, buff2);
+    void *buffer = (void *)malloc(1024);
+    ssize_t count = read(fd, buffer, 1024);
+    rpc::Message *message = reinterpret_cast<rpc::Message *>(buffer);
+    printf("When read, count=%d, msg=%s, magic=%x, length=%d\n",
+            (int)count, message->msg, message->magic, message->length);
+    free(buffer);
     return count;
 }
 

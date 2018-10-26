@@ -15,14 +15,23 @@
 
 void echo(int linkage_fd)
 {
-    ssize_t count;
-    char buff2[50] = "MMMMMMMJJJ";
-    count = write(linkage_fd, buff2, strlen(buff2));
-    printf("When write, count=%d.\n", (int)count);
+    void *buffer = (void *)malloc(1024);
+    ssize_t count = read(linkage_fd, buffer, 1024);
+    printf("When read, count=%d.\n", (int)count);
+    rpc::Message *message = reinterpret_cast<rpc::Message*>(buffer);
+    printf("Get Msg=%s, magic=%x, length=%d\n",
+            message->msg, message->magic, message->length);
 
-    char buff[50];
-    count = read(linkage_fd, &buff, 50);
-    printf("When read, count=%d, buff=%s.\n", (int)count, buff);
+    std::string msg = "Yes, This is my World.";
+    size_t length = rpc::Rpc::GetMessageLength(msg);
+    printf("length=%d\n", (int)length);
+    buffer = realloc(buffer, (unsigned int)length);
+    memset(buffer, 0, length);
+    rpc::Rpc::Serialize(buffer, "HeekkasLL World");
+    count = write(linkage_fd, buffer, length);
+    printf("count=%d\n", (int)count);
+
+    free(buffer);
 }
 
 int main ()

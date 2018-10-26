@@ -48,7 +48,7 @@ size_t Rpc::Serialize(void *buffer, const std::string &msg)
 
     Message *message = reinterpret_cast<Message *>(buffer);
     message->magic = kMagic;
-    message->length = (uint32_t)sizeof(Header) + (uint32_t)strlen(msg.c_str());
+    message->length = (uint32_t)sizeof(Message) + (uint32_t)strlen(msg.c_str());
     strcpy(message->msg, msg.c_str());
     return (size_t)message->length;
 }

@@ -114,6 +114,14 @@ TEST(RPC, F)
     free(buffer1);
 }
 
+TEST(RPC, G)
+{
+    printf("%d, %d\n", sizeof(rpc::Header), sizeof(rpc::Message));
+    std::string msg = "ABCDE";
+    size_t count = rpc::Rpc::GetMessageLength(msg);
+    printf("count=%d\n", (int)count);
+}
+
 int main(int argc, char*argv[])
 {
     testing::InitGoogleTest(&argc, argv);

@@ -1,3 +1,5 @@
+#include <unistd.h>
+#include <string.h>
 #include "rpc.h"
 namespace rpc{
 
@@ -19,6 +21,16 @@ ssize_t Rpc::GetMessageLength(const void *buffer, size_t length)
     return static_cast<ssize_t>(header->length);
 }
 
+size_t Rpc::GetMessageLength(const std::string &msg)
+{
+    return sizeof(Message) + sizeof(msg.c_str());
+}
+
+size_t Rpc::GetHeader()
+{
+    return sizeof(Header);
+}
+
 std::string Rpc::Parse(const void *buffer, size_t length)
 {
     const Message *message = reinterpret_cast<const Message *>(buffer);
@@ -26,9 +38,17 @@ std::string Rpc::Parse(const void *buffer, size_t length)
     return msg;
 }
 
-size_t Rpc::Serialize(void *buffer, const std::string msg, size_t length)
+size_t Rpc::Serialize(void *buffer, const std::string &msg)
 {
-    return 0;
+    if (strlen(msg.c_str()) + sizeof(Message)> kMaximumPacketLength){
+        return 0;
+    }
+
+    Message *message = reinterpret_cast<Message *>(buffer);
+    message->magic = kMagic;
+    message->length = (uint32_t)sizeof(Header) + (uint32_t)strlen(msg.c_str());
+    strcpy(message->msg, msg.c_str());
+    return (size_t)message->length;
 }
 
 }

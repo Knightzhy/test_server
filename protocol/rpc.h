@@ -14,7 +14,7 @@ uint32_t length;
 struct Message{
 uint32_t magic;
 uint32_t length;
-unsigned char msg[1];
+char msg[1];
 };
 #pragma pack(pop)
 

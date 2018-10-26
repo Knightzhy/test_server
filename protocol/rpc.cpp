@@ -21,8 +21,11 @@ ssize_t Rpc::GetMessageLength(const void *buffer, size_t length)
 
 std::string Rpc::Parse(const void *buffer, size_t length)
 {
-    return NULL;
+    const Message *message = reinterpret_cast<const Message *>(buffer);
+    std::string msg = message->msg;
+    return msg;
 }
+
 size_t Rpc::Serialize(void *buffer, const std::string msg, size_t length)
 {
     return 0;

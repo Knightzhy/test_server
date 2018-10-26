@@ -30,8 +30,9 @@ ssize_t read_string(int fd)
     void *buffer = (void *)malloc(1024);
     ssize_t count = read(fd, buffer, 1024);
     rpc::Message *message = reinterpret_cast<rpc::Message *>(buffer);
-    printf("When read, count=%d, msg=%s, magic=%x, length=%d\n",
-            (int)count, message->msg, message->magic, message->length);
+    std::string msg = rpc::Rpc::Parse(buffer, count);
+    printf("When read, count=%d, msg=%s\n",
+          (int)count, msg.c_str());
     free(buffer);
     return count;
 }

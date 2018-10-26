@@ -17,12 +17,10 @@ void echo(int linkage_fd)
 {
     void *buffer = (void *)malloc(1024);
     ssize_t count = read(linkage_fd, buffer, 1024);
-    printf("When read, count=%d.\n", (int)count);
-    rpc::Message *message = reinterpret_cast<rpc::Message*>(buffer);
-    printf("Get Msg=%s, magic=%x, length=%d\n",
-            message->msg, message->magic, message->length);
+    std::string msg = rpc::Rpc::Parse(buffer, (size_t)count);
+    printf("When read, count=%d, msg=%s.\n", (int)count, msg.c_str());
 
-    std::string msg = "Yes, This is my World.";
+    msg = "Yes, This is my World.";
     size_t length = rpc::Rpc::GetMessageLength(msg);
     printf("length=%d\n", (int)length);
     buffer = realloc(buffer, (unsigned int)length);

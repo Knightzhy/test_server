@@ -36,6 +36,8 @@ size_t Rpc::GetHeader()
 std::string Rpc::Parse(const void *buffer, size_t length)
 {
     const Message *message = reinterpret_cast<const Message *>(buffer);
+    printf("Message:msg=%s, magic=%x, length=%d\n",
+            message->msg, message->magic, message->length);
     std::string msg = message->msg;
     return msg;
 }

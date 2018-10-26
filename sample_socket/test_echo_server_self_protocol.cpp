@@ -27,7 +27,7 @@ void echo(int linkage_fd)
     printf("length=%d\n", (int)length);
     buffer = realloc(buffer, (unsigned int)length);
     memset(buffer, 0, length);
-    rpc::Rpc::Serialize(buffer, "HeekkasLL World");
+    rpc::Rpc::Serialize(buffer, msg);
     count = write(linkage_fd, buffer, length);
     printf("count=%d\n", (int)count);
 

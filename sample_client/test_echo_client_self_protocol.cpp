@@ -15,8 +15,13 @@
 
 ssize_t write_string(int fd)
 {
-    char buff[100] = "Hello World.";
-    ssize_t count = write(fd, &buff, strlen(buff));
+    std::string msg = "Hello World.";
+    size_t length = rpc::Rpc::GetMessageLength(msg);
+    void *buffer = (void *)malloc(length);
+    size_t length2 = rpc::Rpc::Serialize(buffer, msg);
+    ssize_t count = write(fd, buffer, length2);
+    printf("length=%d, length2=%d, count=%d\n",
+            (int)length, (int)length2, (int)count);
     return count;
 }
 

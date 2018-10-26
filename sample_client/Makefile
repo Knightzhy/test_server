@@ -9,7 +9,7 @@ MODULEROOT = ../..
 
 MODULEPATH = echo_server/
 
-SUBDIRS = .
+SUBDIRS = . ../protocol/
 
 STATICS =
 
@@ -20,7 +20,7 @@ PKGCONFIGS =
 BINPATH = thirdparty/staging/bin
 
 SEARCHPATH = thirdparty/staging/include \
-	     flinter/output/include 
+	     flinter/output/include
 
 LIBRARYPATH = thirdparty/staging/lib \
 	      flinter/output/lib

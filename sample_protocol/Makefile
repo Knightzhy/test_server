@@ -9,18 +9,18 @@ MODULEROOT = ../..
 
 MODULEPATH = echo_server/
 
-SUBDIRS = .
+SUBDIRS = . ../protocol/
 
 STATICS =
 
-LIBRARIES =
+LIBRARIES = pthread gtest gtest_main
 
 PKGCONFIGS =
 
 BINPATH = thirdparty/staging/bin
 
 SEARCHPATH = thirdparty/staging/include \
-	     flinter/output/include
+	     flinter/output/include 
 
 LIBRARYPATH = thirdparty/staging/lib \
 	      flinter/output/lib

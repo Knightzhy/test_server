@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
-#include "rpc.h"
+#include "test_server/protocol/rpc.h"
 
 #include <gtest/gtest.h>
 TEST(RPC, A)

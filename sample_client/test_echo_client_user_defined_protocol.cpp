@@ -9,10 +9,17 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <vector>
 
 #include "test_server/protocol/rpc.h"
 
+extern ssize_t writen(int fd, const void *vptr, size_t n);
 
+extern ssize_t readn(int fd, void *vptr, size_t n);
+
+/*
+ * single packet with user-defined protocol
+ * */
 ssize_t write_string(int fd)
 {
     std::string msg = "Hello World.";
@@ -22,6 +29,8 @@ ssize_t write_string(int fd)
     ssize_t count = write(fd, buffer, length2);
     printf("length=%d, length2=%d, count=%d\n",
             (int)length, (int)length2, (int)count);
+    free(buffer);
+    buffer = NULL;
     return count;
 }
 
@@ -34,8 +43,58 @@ ssize_t read_string(int fd)
     printf("When read, count=%d, msg=%s\n",
           (int)count, msg.c_str());
     free(buffer);
+    buffer = NULL;
     return count;
 }
+
+/*
+ * continuous packet with user_defined protocol
+ * */
+size_t GetMessageLength(const std::vector<std::string> &v)
+{
+    if (v.size() == 0) {
+        return 0;
+    }
+    size_t length = 0;
+    for(int i=0; i < v.size(); i++) {
+        length += rpc::Rpc::GetMessageLength(v[i]);
+    }
+    return length;
+}
+
+ssize_t write_string2(int fd)
+{
+    std::vector<std::string> v;
+    v.push_back("ABC");
+    v.push_back("ABC1");
+    v.push_back("ABC2");
+    v.push_back("ABC3");
+
+    size_t total_length = GetMessageLength(v);
+    printf("total_length=%d\n", total_length);
+    void *buffer = (void *)malloc(total_length);
+    size_t length = 0;
+    for (int i=0; i < v.size() ; i++) {
+        length = length + rpc::Rpc::Serialize((buffer + length), v[i]);
+        if (total_length < length) {
+            printf("Error, total_length=%d, length=%d\n",
+                    total_length, length);
+            return 0;
+        }
+    }
+    if (total_length != length) {
+        printf("Error, total_length=%d, length=%d\n",
+                total_length, length);
+        return 0;
+    }
+
+    ssize_t count = writen(fd, buffer, total_length);
+    printf("When writen, count=%d\n", count);
+    return count;
+}
+
+ssize_t read_string2(int fd)
+{}
 
 int set_nonblockint(int fd) {
     int flags;

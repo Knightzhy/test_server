@@ -94,7 +94,22 @@ ssize_t write_string2(int fd)
 }
 
 ssize_t read_string2(int fd)
-{}
+{
+    size_t buffer_length = 1024;
+    void *buffer = (void *)malloc(buffer_length);
+    memset(buffer, 0, buffer_length);
+
+    do{
+        ssize_t count = readn(fd, buffer, buffer_length);
+        if (count > buffer_length) {
+            printf("Error, count>buffer_length\n");
+        }
+        ssize_t msg_length = rpc::Rpc::GetMessageLength(buffer, (size_t)count);
+
+    }while(count != 0)
+
+    free(buffer);
+}
 
 int set_nonblockint(int fd) {
     int flags;

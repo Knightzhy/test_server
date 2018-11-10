@@ -258,6 +258,85 @@ TEST(ST, M)
     printf("h=%s\tpoint=%p\n", h, h);
 }
 
+TEST(ST, N)
+{
+#pragma pack(push)
+#pragma pack(push)
+    struct Message{
+        uint32_t length;
+        char msg[1];
+    };
+#pragma pack(pop)
+    printf("Message sizeof=%d\n", sizeof(Message));
+    void * buffer = (void *)malloc(18);
+    char * buffer_char = reinterpret_cast<char *>(buffer);
+    Message *a = reinterpret_cast<Message *>(buffer);
+    a->length = 10;
+    strcpy(a->msg, "ABCDE");
+    Message *b = reinterpret_cast<Message *>(buffer + 10);
+    b->length = 8;
+    strcpy(b->msg, "FGH");
+
+    printf("buffer_char point\n");
+    for(int i =0; i < 18; i++){
+        printf("%x\t%p\n", (char)buffer_char[i], &buffer_char[i]);
+    }
+
+    printf("a.point=%p\n", a);
+    printf("b.point=%p\n", b);
+
+    Message *c = reinterpret_cast<Message *>(buffer);
+    printf("c.point=%p,c.length=%d, c.msg=%s\n", c, c->length, c->msg);
+    Message *d = reinterpret_cast<Message *>(buffer + 10);
+    printf("d.point=%p,d.length=%d, d.msg=%s\n", d, d->length, d->msg);
+    free(buffer);
+}
+
+TEST(ST, O)
+{
+#pragma pack(push)
+#pragma pack(push)
+    struct Message{
+        char name[4];
+        char msg[1];
+    };
+#pragma pack(pop)
+    printf("Message sizeof=%d\n", sizeof(Message));
+    void * buffer = (void *)malloc(18);
+    char * buffer_char = reinterpret_cast<char *>(buffer);
+    Message *a = reinterpret_cast<Message *>(buffer);
+    strcpy(a->name, "aaa");
+    strcpy(a->msg, "ABCDE");
+    Message *b = reinterpret_cast<Message *>(buffer + 10);
+    strcpy(b->name, "bbb");
+    strcpy(b->msg, "FGH");
+
+    printf("buffer_char point\n");
+    for(int i =0; i < 18; i++){
+        printf("%x\t%p\n", (char)buffer_char[i], &buffer_char[i]);
+    }
+
+    printf("a.point=%p\n", a);
+    printf("b.point=%p\n", b);
+
+    Message *c = reinterpret_cast<Message *>(buffer);
+    printf("c.point=%p,c.name=%s, c.msg=%s\n", c, c->name, c->msg);
+    Message *d = reinterpret_cast<Message *>(buffer + 10);
+    printf("d.point=%p,d.name=%s, d.msg=%s\n", d, d->name, d->msg);
+    free(buffer);
+}
+
+TEST(ST, P)
+{
+    void * buffer1 = (void *)malloc(10);
+    void * buffer2 = (void *)malloc(8);
+    printf("buffer1.point=%p\n", buffer1);
+    printf("buffer2.point=%p\n", buffer2);
+    free(buffer1);
+    free(buffer2);
+}
+
+
 
 int main(int argc, char *argv[])
 {

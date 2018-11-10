@@ -286,9 +286,11 @@ TEST(ST, N)
     printf("b.point=%p\n", b);
 
     Message *c = reinterpret_cast<Message *>(buffer);
-    printf("c.point=%p,c.length=%d, c.msg=%s\n", c, c->length, c->msg);
+    printf("c.point=%p,c.length=%d, c.msg=%s, c.msg.length=%d\n",
+            c, c->length, c->msg, strlen(c->msg));
     Message *d = reinterpret_cast<Message *>(buffer + 10);
-    printf("d.point=%p,d.length=%d, d.msg=%s\n", d, d->length, d->msg);
+    printf("d.point=%p,d.length=%d, d.msg=%s, d.msg.length=%d\n",
+            d, d->length, d->msg, strlen(d->msg));
     free(buffer);
 }
 

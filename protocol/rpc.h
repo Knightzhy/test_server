@@ -26,6 +26,7 @@ static ssize_t GetMessageLength(const void * buffer, size_t length);
 static size_t GetMessageLength(const std::string &msg);
 static size_t GetHeader();
 static std::string Parse(const void *buffer, size_t length);
+static int Parse(const void *buffer, size_t length, std::string &msg);
 static size_t Serialize(void *buffer, const std::string &msg);
 
 static const uint32_t kMagic;

@@ -42,6 +42,25 @@ std::string Rpc::Parse(const void *buffer, size_t length)
     return msg;
 }
 
+int Rpc::Parse(const void *buffer, size_t length, std::string &msg)
+{
+    const Message *message = reinterpret_cast<const Message *>(buffer);
+    printf("Message:msg=%s, magic=%x, length=%d\n",
+            message->msg, message->magic, message->length);
+    if (message->length > length) {
+        printf("Error, message->length=%d, length=%d",
+                message->length, (int)length);
+        return -1;
+    }
+    if (strlen(message->msg) > length) {
+        printf("Error, strlen(message->msg=%d, length=%d",
+                strlen(message->msg), (int)length);
+        return -2;
+    }
+    msg = message->msg;
+    return 0;
+}
+
 size_t Rpc::Serialize(void *buffer, const std::string &msg)
 {
     if (strlen(msg.c_str()) + sizeof(Message)> kMaximumPacketLength){

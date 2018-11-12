@@ -338,6 +338,16 @@ TEST(ST, P)
     free(buffer2);
 }
 
+TEST(ST, Q)
+{
+    std::string msg = "AN\0MMjseOOqQKW";
+    std::cout << "msg:" << msg << std::endl;
+    std::cout << "length:" << strlen(msg.c_str())
+              << ", sizeof=" << sizeof(msg)
+              << ", size()=" << msg.size()
+              << ", msg[5]=" << msg[5]
+              << std::endl;
+}
 
 
 int main(int argc, char *argv[])

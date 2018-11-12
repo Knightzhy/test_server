@@ -92,21 +92,51 @@ ssize_t write_string2(int fd)
     printf("When writen, count=%d\n", count);
     return count;
 }
+ssize_t parse(void *buffer_used, ssize_t count_used)
+{
+    do{
+        ssize_t msg_length = rpc::Rpc::GetMessageLength(buffer_used,
+                (size_t)count_used);
+        if (msg_length == 0) {
+            break;
+        }
+        std::string msg;
+        int ret = rpc::Rpc::Parse(buffer_used, msg_length, msg);
+        printf("Read msg:%s\n", msg.c_str());
+        buffer_used = buffer_used + msg_length;
+        count_used = count_used-msg_length;
+    } while(count_used > 0);
+    return count_used;
+}
 
 ssize_t read_string2(int fd)
 {
     size_t buffer_length = 1024;
     void *buffer = (void *)malloc(buffer_length);
-    memset(buffer, 0, buffer_length);
+    void *buffer_used;
+    ssize_t count_used = 0;
 
-    do{
-        ssize_t count = readn(fd, buffer, buffer_length);
-        if (count > buffer_length) {
+    do {
+        buffer_used = buffer;
+        memset(buffer_used + count_used, 0, buffer_length - count_used);
+        ssize_t count;
+        count = readn(fd, buffer_used + count_used, buffer_length - count_used);
+        if (count == 0) {
+            printf("read bytes=0\n");
+            break;
+        }
+        if (count < 0) {
+            printf("read error, ret=%d\n", (int)count);
+            break;
+        }
+        count_used = count_used + count;
+        if (count_used > buffer_length) {
             printf("Error, count>buffer_length\n");
         }
-        ssize_t msg_length = rpc::Rpc::GetMessageLength(buffer, (size_t)count);
 
-    }while(count != 0)
+        count_used = parse(buffer_used, count_used);
+        strncpy((char *)buffer, (char *)buffer_used, count_used);
+    } while(count_used != 0);
 
     free(buffer);
 }
@@ -153,7 +183,7 @@ int main()
         close(socket_fd);
         return 0;
    }
-    ssize_t count = write_string(socket_fd);
+    ssize_t count = write_string2(socket_fd);
     while(true) {
         int wait_fds = epoll_wait(epoll_fd, evs,1, -1);
         if (wait_fds <= -1) {
@@ -165,7 +195,7 @@ int main()
         if (wait_fds == 0) {
             continue;
         }
-        count = read_string(evs[0].data.fd);
+        count = read_string2(evs[0].data.fd);
         break;
     }
 

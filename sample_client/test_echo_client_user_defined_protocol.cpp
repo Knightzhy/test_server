@@ -90,6 +90,7 @@ ssize_t write_string2(int fd)
 
     ssize_t count = writen(fd, buffer, total_length);
     printf("When writen, count=%d\n", count);
+    free(buffer);
     return count;
 }
 ssize_t parse(void *buffer_used, ssize_t count_used)
@@ -120,6 +121,7 @@ ssize_t read_string2(int fd)
         buffer_used = buffer;
         memset(buffer_used + count_used, 0, buffer_length - count_used);
         ssize_t count;
+        printf("Readn\n");
         count = readn(fd, buffer_used + count_used, buffer_length - count_used);
         if (count == 0) {
             printf("read bytes=0\n");
@@ -185,6 +187,7 @@ int main()
    }
     ssize_t count = write_string2(socket_fd);
     while(true) {
+        printf("xx\n");
         int wait_fds = epoll_wait(epoll_fd, evs,1, -1);
         if (wait_fds <= -1) {
             printf("epoll wait error, errno=%d, error=%s\n", errno, strerror(errno));

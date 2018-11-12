@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <unistd.h>
 ssize_t writen(int fd, const void *vptr, size_t n)
 {
@@ -7,6 +8,7 @@ ssize_t writen(int fd, const void *vptr, size_t n)
     nleft = n;
     while (nleft >0) {
         nwriten = write(fd, ptr, nleft);
+        printf("write fd Bytes[%d]\n", nwriten);
         if (nwriten < 0) {
             return -1;
         }

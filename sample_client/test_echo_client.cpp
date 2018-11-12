@@ -41,6 +41,7 @@ int main()
         return 0;
     }
     printf("connect success.\n");
+    set_nonblockint(socket_fd);
 
     int epoll_fd = epoll_create(5);
     struct epoll_event ev;

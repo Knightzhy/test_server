@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <stdio.h>
 
 ssize_t readn(int fd, void *vptr, size_t n)
 {
@@ -11,6 +12,7 @@ ssize_t readn(int fd, void *vptr, size_t n)
         if ( (nread = read(fd, ptr, nleft)) < 0) {
             return -1;
         }
+        printf("read xx=%d\n", nread);
         if (nread == 0) {
             break;
         }

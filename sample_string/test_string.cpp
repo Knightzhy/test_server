@@ -349,6 +349,15 @@ TEST(ST, Q)
               << std::endl;
 }
 
+TEST(ST, R)
+{
+struct msg{
+    char payload[];
+};
+    msg a;
+    printf("sizeof=%d, sizeof=%d, strlen=%d\n", sizeof(msg), sizeof(a), strlen(a.payload));
+}
+
 
 int main(int argc, char *argv[])
 {

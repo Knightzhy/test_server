@@ -133,6 +133,7 @@ void *func(void* m)
     int ret = set_nonblockint(linkage_fd);
     printf("fcntl=%d\n", ret);
     echo(linkage_fd);
+    sleep(5);
     close(linkage_fd);
     return NULL;
 }

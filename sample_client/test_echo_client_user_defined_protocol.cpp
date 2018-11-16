@@ -184,7 +184,8 @@ int main()
         close(epoll_fd);
         close(socket_fd);
         return 0;
-   }
+    }
+    set_nonblockint(socket_fd);
     ssize_t count = write_string2(socket_fd);
     while(true) {
         printf("xx\n");

@@ -13,7 +13,7 @@ SUBDIRS = . ../protocol/ ../../ironman/serialize/
 
 STATICS =
 
-LIBRARIES = pthread
+LIBRARIES = pthread gtest gtest_main
 
 PKGCONFIGS =
 

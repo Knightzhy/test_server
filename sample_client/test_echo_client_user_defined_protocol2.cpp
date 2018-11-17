@@ -30,6 +30,19 @@ int write_message(int fd)
     string_payload.PrintMsg();
     return ret;
 }
+int write_message2(int fd)
+{
+    ironman::serialize::SampleHeader sample_header(56766, 1231, 118);
+    ironman::serialize::StringPayload string_payload("Welcome to you.");
+    ironman::serialize::Message message(98120, &sample_header, &string_payload);
+    ironman::serialize::rpc::MessageFactory message_factory(&message);
+    ironman::serialize::rpc::RpcBase rpc_base;
+    int ret = rpc_base.Sended(fd, &message_factory);
+    printf("Sended ret=%d.\n", ret);
+    sample_header.PrintOptions();
+    string_payload.PrintMsg();
+    return ret;
+}
 int read_message(int fd)
 {
     ironman::serialize::SampleHeader sample_header;
@@ -86,6 +99,7 @@ int main()
     }
     set_nonblockint(socket_fd);
     int count = write_message(socket_fd);
+    count = write_message2(socket_fd);
     while(true) {
         printf("xx\n");
         int wait_fds = epoll_wait(epoll_fd, evs,1, -1);

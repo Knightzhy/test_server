@@ -14,6 +14,11 @@
 #include <fcntl.h>
 
 #include "test_server/protocol/rpc.h"
+#include "ironman/serialize/sample_header.h"
+#include "ironman/serialize/string_payload.h"
+#include "ironman/serialize/message.h"
+#include "ironman/serialize/message_factory.h"
+#include "ironman/serialize/rpc.h"
 extern ssize_t writen(int fd, const void *vptr, size_t n);
 extern ssize_t readn(int fd, void *vptr, size_t n);
 
@@ -148,6 +153,34 @@ int read_string(int fd)
     return total_length;
 }
 
+/*
+ * user define protocol
+ * */
+int write_message(int fd)
+{
+    ironman::serialize::SampleHeader sample_header(56766, 1230, 118);
+    ironman::serialize::StringPayload string_payload("Hello World,Tom.");
+    ironman::serialize::Message message(98120, &sample_header, &string_payload);
+    ironman::serialize::rpc::MessageFactory message_factory(&message);
+    ironman::serialize::rpc::RpcBase rpc_base;
+    int ret = rpc_base.Sended(fd, &message_factory);
+    printf("Sended ret=%d.\n", ret);
+    sample_header.PrintOptions();
+    string_payload.PrintMsg();
+    return ret;
+}
+int read_message(int fd)
+{
+    ironman::serialize::SampleHeader sample_header;
+    ironman::serialize::StringPayload string_payload;
+    ironman::serialize::Message message(98120, &sample_header, &string_payload);
+    ironman::serialize::rpc::MessageFactory message_factory(&message);
+    ironman::serialize::rpc::RpcBase rpc_base;
+    int ret = rpc_base.Received(fd, &message_factory);
+    printf("Received ret=%d.\n", ret);
+    return ret;
+}
+
 int epoll_client(int &socket_fd, int (*write_message)(int), int (*read_message)(int))
 {
     int epoll_fd = epoll_create(5);
@@ -209,6 +242,15 @@ TEST(STRING, EPOLL)
     int ret = sample_connect(socket_fd);
     EXPECT_EQ(ret, 0);
     ret = epoll_client(socket_fd, write_string, read_string);
+    EXPECT_EQ(ret, 0);
+}
+
+TEST(MESSAGE, EPOLL)
+{
+    int socket_fd;
+    int ret = sample_connect(socket_fd);
+    EXPECT_EQ(ret, 0);
+    ret = epoll_client(socket_fd, write_message, read_message);
     EXPECT_EQ(ret, 0);
 }
 

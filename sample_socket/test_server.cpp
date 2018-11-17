@@ -12,6 +12,14 @@
 #include <unistd.h>
 #include <gtest/gtest.h>
 
+#include "test_server/protocol/rpc.h"
+#include "ironman/serialize/sample_header.h"
+#include "ironman/serialize/string_payload.h"
+#include "ironman/serialize/message.h"
+#include "ironman/serialize/message_factory.h"
+#include "ironman/serialize/rpc.h"
+extern ssize_t writen(int fd, const void *vptr, size_t n);
+extern ssize_t readn(int fd, void *vptr, size_t n);
 #pragma pack(push)
 #pragma pack(1)
 struct FuncData {
@@ -113,6 +121,107 @@ int read_char(int fd)
     return count;
 }
 
+/*
+ * single packet with user-defined protocol
+ * */
+int write_string(int fd)
+{
+    std::string msg = "What's wrong?";
+    size_t length = rpc::Rpc::GetMessageLength(msg);
+    void *buffer = (void *)malloc(length);
+    size_t length2 = rpc::Rpc::Serialize(buffer, msg);
+    ssize_t count = writen(fd, buffer, length2);
+    printf("write [%s] to fd[%d] "
+            "GetMessageLength.length=%d, Serialize.length=%d, writen.length=%d\n",
+            msg.c_str(), fd,
+            (int)length, (int)length2, (int)count);
+    free(buffer);
+    buffer = NULL;
+    return count;
+}
+
+ssize_t parse(void *buffer_used, ssize_t count_used)
+{
+    do{
+        ssize_t msg_length = rpc::Rpc::GetMessageLength(buffer_used,
+                (size_t)count_used);
+        if (msg_length == 0) {
+            break;
+        }
+        std::string msg;
+        int ret = rpc::Rpc::Parse(buffer_used, msg_length, msg);
+        printf("read [%s]\n", msg.c_str());
+        buffer_used = buffer_used + msg_length;
+        count_used = count_used-msg_length;
+    } while(count_used > 0);
+    return count_used;
+}
+
+int read_string(int fd)
+{
+    size_t buffer_length = 1024;
+    void *buffer = (void *)malloc(buffer_length);
+    void *buffer_used;
+    ssize_t count_used = 0;
+
+    ssize_t total_length = 0;
+    do {
+        buffer_used = buffer;
+        memset(buffer_used + count_used, 0, buffer_length - count_used);
+        ssize_t count;
+        count = readn(fd, buffer_used + count_used, buffer_length - count_used);
+        if (count == 0) {
+            break;
+        }
+        if (count < 0) {
+            printf("readn error, ret=%d\n", (int)count);
+            free(buffer);
+            return -1;
+        }
+        count_used = count_used + count;
+        if (count_used > buffer_length) {
+            printf("Error, count>buffer_length %d > %d\n", count_used, buffer_length);
+            free(buffer);
+            return -1;
+        }
+
+        count_used = parse(buffer_used, count_used);
+        strncpy((char *)buffer, (char *)buffer_used, count_used);
+        total_length += count_used;
+    } while(count_used != 0);
+
+    free(buffer);
+    return total_length;
+}
+
+/*
+ * user define protocol
+ * */
+int write_message(int fd)
+{
+    ironman::serialize::SampleHeader sample_header(56766, 1230, 118);
+    ironman::serialize::StringPayload string_payload("Yes, it's me.");
+    ironman::serialize::Message message(98120, &sample_header, &string_payload);
+    ironman::serialize::rpc::MessageFactory message_factory(&message);
+    ironman::serialize::rpc::RpcBase rpc_base;
+    int ret = rpc_base.Sended(fd, &message_factory);
+    printf("Sended ret=%d.\n", ret);
+    sample_header.PrintOptions();
+    string_payload.PrintMsg();
+    return ret;
+}
+int read_message(int fd)
+{
+    ironman::serialize::SampleHeader sample_header;
+    ironman::serialize::StringPayload string_payload;
+    ironman::serialize::Message message(98120, &sample_header, &string_payload);
+    ironman::serialize::rpc::MessageFactory message_factory(&message);
+    ironman::serialize::rpc::RpcBase rpc_base;
+    int ret = rpc_base.Received(fd, &message_factory);
+    printf("Received ret=%d.\n", ret);
+    return ret;
+}
+
 int one_accept(int &listening_fd, int (*write_message)(int), int (*read_message)(int))
 {
     // accept
@@ -193,6 +302,42 @@ TEST(CHAR, THREAD)
     int ret = sample_listen(listening_fd);
     EXPECT_EQ(ret, 0);
     ret = thread_accept(listening_fd, write_char, read_char);
+    EXPECT_EQ(ret, 0);
+}
+
+TEST(STRING, ONE)
+{
+    int listening_fd;
+    int ret = sample_listen(listening_fd);
+    EXPECT_EQ(ret, 0);
+    ret = one_accept(listening_fd, write_string, read_string);
+    EXPECT_EQ(ret, 0);
+}
+
+TEST(STRING, THREAD)
+{
+    int listening_fd;
+    int ret = sample_listen(listening_fd);
+    EXPECT_EQ(ret, 0);
+    ret = thread_accept(listening_fd, write_string, read_string);
+    EXPECT_EQ(ret, 0);
+}
+
+TEST(MESSAGE, ONE)
+{
+    int listening_fd;
+    int ret = sample_listen(listening_fd);
+    EXPECT_EQ(ret, 0);
+    ret = one_accept(listening_fd, write_message, read_message);
+    EXPECT_EQ(ret, 0);
+}
+
+TEST(MESSAGE, THREAD)
+{
+    int listening_fd;
+    int ret = sample_listen(listening_fd);
+    EXPECT_EQ(ret, 0);
+    ret = thread_accept(listening_fd, write_message, read_message);
     EXPECT_EQ(ret, 0);
 }
 

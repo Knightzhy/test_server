@@ -194,7 +194,7 @@ int epoll_client(int &socket_fd, int (*write_message)(int), int (*read_message)(
     return 0;
 }
 
-TEST(RPC, A)
+TEST(CHAR, EPOLL)
 {
     int socket_fd;
     int ret = sample_connect(socket_fd);
@@ -203,7 +203,7 @@ TEST(RPC, A)
     EXPECT_EQ(ret, 0);
 }
 
-TEST(RPC, B)
+TEST(STRING, EPOLL)
 {
     int socket_fd;
     int ret = sample_connect(socket_fd);

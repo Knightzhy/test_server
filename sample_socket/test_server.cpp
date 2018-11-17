@@ -287,6 +287,63 @@ int thread_accept(int &listening_fd, int (*write_message)(int), int (*read_messa
     return 0;
 }
 
+int process_accept(int &listening_fd, int (*write_message)(int), int (*read_message)(int))
+{
+    while (1) {
+        // accept
+        int linkage_fd;
+        sockaddr_in client_addr;
+        bzero(&client_addr, sizeof(client_addr));
+        int client_addr_len = sizeof(client_addr);
+        linkage_fd = accept(listening_fd, (struct sockaddr *)&client_addr, (socklen_t *)&client_addr_len);
+        if (linkage_fd < 0) {
+            printf ("When accept a linkage, there is a wrong. errno:%d\n", linkage_fd);
+            return -1;
+        }
+        printf ("accept a linkage [%d], ip[%s], port[%d]\n",
+                linkage_fd, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+
+        pid_t pid;
+        pid = fork();
+        if (pid <0) {
+            printf("fork error.\n");
+            return -1;
+        }
+        if (pid >0) {
+            waitpid(pid, NULL, 0);
+            printf("grand father pid=%d, child pid=%d\n", (int)getpid(), (int)pid);
+            close(linkage_fd);
+            continue;
+        }
+
+        printf("child pid=%d\n", (int)getpid());
+        close(listening_fd);
+        pid =fork();
+        if (pid <0) {
+            close(linkage_fd);
+            exit(1);
+        }
+        if (pid >0) {
+            printf("child pid=%d, grand son pid=%d\n", (int)getpid(), (int)pid);
+            close(linkage_fd);
+            exit(0);
+        } else {
+            printf("grand son pid=%d\n", (int)getpid());
+            FuncData func_data;
+            func_data.fd = linkage_fd;
+            func_data.write_func = write_message;
+            func_data.read_func = read_message;
+            pthread_func(&func_data);
+            close(linkage_fd);
+            exit(0);
+        }
+    }
+
+    // close listening fd
+    close(listening_fd);
+    return 0;
+}
+
 TEST(CHAR, ONE)
 {
     int listening_fd;
@@ -302,6 +359,15 @@ TEST(CHAR, THREAD)
     int ret = sample_listen(listening_fd);
     EXPECT_EQ(ret, 0);
     ret = thread_accept(listening_fd, write_char, read_char);
+    EXPECT_EQ(ret, 0);
+}
+
+TEST(CHAR, PROCESS)
+{
+    int listening_fd;
+    int ret = sample_listen(listening_fd);
+    EXPECT_EQ(ret, 0);
+    ret = process_accept(listening_fd, write_char, read_char);
     EXPECT_EQ(ret, 0);
 }
 
@@ -323,6 +389,15 @@ TEST(STRING, THREAD)
     EXPECT_EQ(ret, 0);
 }
 
+TEST(STRING, PROCESS)
+{
+    int listening_fd;
+    int ret = sample_listen(listening_fd);
+    EXPECT_EQ(ret, 0);
+    ret = process_accept(listening_fd, write_string, read_string);
+    EXPECT_EQ(ret, 0);
+}
+
 TEST(MESSAGE, ONE)
 {
     int listening_fd;
@@ -338,6 +413,15 @@ TEST(MESSAGE, THREAD)
     int ret = sample_listen(listening_fd);
     EXPECT_EQ(ret, 0);
     ret = thread_accept(listening_fd, write_message, read_message);
+    EXPECT_EQ(ret, 0);
+}
+
+TEST(MESSAGE, PROCESS)
+{
+    int listening_fd;
+    int ret = sample_listen(listening_fd);
+    EXPECT_EQ(ret, 0);
+    ret = process_accept(listening_fd, write_message, read_message);
     EXPECT_EQ(ret, 0);
 }
 

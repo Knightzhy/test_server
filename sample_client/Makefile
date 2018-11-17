@@ -9,7 +9,7 @@ MODULEROOT = ../..
 
 MODULEPATH = echo_server/
 
-SUBDIRS = . ../protocol/
+SUBDIRS = . ../../ironman/serialize/ ../protocol/
 
 STATICS =
 

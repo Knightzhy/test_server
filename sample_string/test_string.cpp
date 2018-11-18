@@ -358,6 +358,15 @@ struct msg{
     printf("sizeof=%d, sizeof=%d, strlen=%d\n", sizeof(msg), sizeof(a), strlen(a.payload));
 }
 
+TEST(ST, S)
+{
+    int a[10];
+    memset(a, -1, 10);
+    for (int i = 0; i < 10; i++) {
+        printf("i:%d\t", a[i]);
+    }
+}
+
 
 int main(int argc, char *argv[])
 {

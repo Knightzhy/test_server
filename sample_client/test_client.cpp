@@ -74,7 +74,7 @@ int write_char(int fd)
 }
 int read_char(int fd)
 {
-    char buffer[100];
+    char buffer[100] = {0};
     ssize_t count = read(fd, buffer, 100);
     printf("read [%s] to fd[%d], return [%d].\n", buffer, fd, count);
     return count;
@@ -194,7 +194,7 @@ int epoll_client(int &socket_fd, int (*write_message)(int), int (*read_message)(
         close(socket_fd);
         return -1;
    }
-    ssize_t count = write_message(socket_fd);
+    int count = write_message(socket_fd);
     if (count < 0) {
         printf("write_message error ret=%d.\n", count);
         close(epoll_fd);
@@ -227,6 +227,54 @@ int epoll_client(int &socket_fd, int (*write_message)(int), int (*read_message)(
     return 0;
 }
 
+/*
+ * int select(int maxfdp,fd_set *readfds,fd_set *writefds,
+ * fd_set *errorfds,struct timeval *timeout);
+ * */
+int select_client(int &socket_fd, int (*write_message)(int), int (*read_message)(int))
+{
+    int max_fd = socket_fd;
+    fd_set rfds;
+    fd_set wfds;
+    struct timeval tv;
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+    
+    while (1) {
+        FD_ZERO(&rfds);
+        FD_ZERO(&wfds);
+        FD_SET(max_fd, &rfds);
+        FD_SET(max_fd, &wfds);
+            
+        int ret = select(max_fd + 1, &rfds, &wfds, NULL, &tv);
+        printf("select return [%d]\n", ret);
+        if (ret <=0) {
+            printf("select return [%d]\n", ret);
+            break;
+        }
+        if (FD_ISSET(max_fd, &rfds)) {
+            int count = read_message(socket_fd);
+            if (count < 0) {
+                printf("read_message error ret=%d.\n", count);
+                close(socket_fd);
+                return -1;
+            }
+            printf("XX\n");
+        }
+            printf("ZZ\n");
+        if (FD_ISSET(max_fd, &wfds)) {
+            int count = write_message(socket_fd);
+            printf("YY\n");
+            if (count < 0) {
+                printf("write_message error ret=%d.\n", count);
+                close(socket_fd);
+                return -1;
+            }
+        }
+        sleep(1);
+    }
+}
+
 TEST(CHAR, EPOLL)
 {
     int socket_fd;
@@ -254,8 +302,18 @@ TEST(MESSAGE, EPOLL)
     EXPECT_EQ(ret, 0);
 }
 
+TEST(CHAR, SELECT)
+{
+    int socket_fd;
+    int ret = sample_connect(socket_fd);
+    EXPECT_EQ(ret, 0);
+    ret = select_client(socket_fd, write_char, read_char);
+    EXPECT_EQ(ret, 0);
+}
+
 int main(int argc, char *argv[])
 {
+    signal(SIGPIPE, SIG_IGN);
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

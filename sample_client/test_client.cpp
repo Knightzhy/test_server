@@ -259,12 +259,9 @@ int select_client(int &socket_fd, int (*write_message)(int), int (*read_message)
                 close(socket_fd);
                 return -1;
             }
-            printf("XX\n");
         }
-            printf("ZZ\n");
         if (FD_ISSET(max_fd, &wfds)) {
             int count = write_message(socket_fd);
-            printf("YY\n");
             if (count < 0) {
                 printf("write_message error ret=%d.\n", count);
                 close(socket_fd);

@@ -12,6 +12,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <sys/poll.h>
 
 #include "test_server/protocol/rpc.h"
 #include "ironman/serialize/sample_header.h"
@@ -272,6 +273,48 @@ int select_client(int &socket_fd, int (*write_message)(int), int (*read_message)
     }
 }
 
+/*
+ * #include <poll.h>
+ * int poll ( struct pollfd * fds, unsigned int nfds, int timeout);
+ * struct pollfd {
+ *     int fd;  
+ *     short events; 
+ *     short revents; 
+ * };
+ * */
+int poll_client(int &socket_fd, int (*write_message)(int), int (*read_message)(int))
+{
+    pollfd pfd;
+    pfd.fd = socket_fd;
+    pfd.events = POLLIN;
+
+    int ret = poll(&pfd, 1, 0);
+    if (ret == -1){
+        printf("poll error [%d]\n", ret);
+        close(socket_fd);
+        return -1;
+    }
+    while (1){
+        if ((pfd.revents & POLLIN) == POLLIN) {
+            int count = read_message(socket_fd);
+            if (count < 0) {
+                printf("read_message error ret=%d.\n", count);
+                close(socket_fd);
+                return -1;
+            }
+            count = write_message(socket_fd);
+            if (count < 0) {
+                printf("write_message error ret=%d.\n", count);
+                close(socket_fd);
+                return -1;
+            }
+            break;
+        }
+    }
+    close(socket_fd);
+    return 0;
+}
+
 TEST(CHAR, EPOLL)
 {
     int socket_fd;
@@ -305,6 +348,14 @@ TEST(CHAR, SELECT)
     int ret = sample_connect(socket_fd);
     EXPECT_EQ(ret, 0);
     ret = select_client(socket_fd, write_char, read_char);
+    EXPECT_EQ(ret, 0);
+}
+TEST(CHAR, POLL)
+{
+    int socket_fd;
+    int ret = sample_connect(socket_fd);
+    EXPECT_EQ(ret, 0);
+    ret = poll_client(socket_fd, write_char, read_char);
     EXPECT_EQ(ret, 0);
 }
 

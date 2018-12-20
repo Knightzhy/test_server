@@ -20,8 +20,7 @@
 #include "ironman/serialize/message.h"
 #include "ironman/serialize/message_factory.h"
 #include "ironman/serialize/rpc.h"
-extern ssize_t writen(int fd, const void *vptr, size_t n);
-extern ssize_t readn(int fd, void *vptr, size_t n);
+#include "ironman/serialize/safe_io.h"
 
 /*
  * TODO
@@ -90,7 +89,7 @@ int write_string(int fd)
     size_t length = rpc::Rpc::GetMessageLength(msg);
     void *buffer = (void *)malloc(length);
     size_t length2 = rpc::Rpc::Serialize(buffer, msg);
-    ssize_t count = writen(fd, buffer, length2);
+    ssize_t count = ironman::serialize::writen(fd, buffer, length2);
     printf("write [%s] to fd[%d] "
             "GetMessageLength.length=%d, Serialize.length=%d, writen.length=%d\n",
             msg.c_str(), fd,
@@ -129,7 +128,7 @@ int read_string(int fd)
         buffer_used = buffer;
         memset(buffer_used + count_used, 0, buffer_length - count_used);
         ssize_t count;
-        count = readn(fd, buffer_used + count_used, buffer_length - count_used);
+        count = ironman::serialize::readn(fd, buffer_used + count_used, buffer_length - count_used);
         if (count == 0) {
             break;
         }

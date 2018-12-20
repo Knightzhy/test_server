@@ -18,8 +18,7 @@
 #include "ironman/serialize/message.h"
 #include "ironman/serialize/message_factory.h"
 #include "ironman/serialize/rpc.h"
-extern ssize_t writen(int fd, const void *vptr, size_t n);
-extern ssize_t readn(int fd, void *vptr, size_t n);
+#include "ironman/serialize/safe_io.h"
 #pragma pack(push)
 #pragma pack(1)
 struct FuncData {
@@ -103,6 +102,107 @@ int sample_listen(int &listening_fd)
     return 0;
 }
 
+void add_fd(int fd, int array_fd[], int size)
+{
+    for (int i = 0; i < size ; i++) {
+        if (array_fd[i] <= 0) {
+            array_fd[i] = fd;
+            break;
+        }
+    }
+}
+void del_fd(int fd, int array_fd[], int size)
+{
+    for (int i = 0; i < size; i++) {
+        if (array_fd[i] == fd) {
+            array_fd[i] = -1;
+            break;
+        }
+    }
+}
+
+int one_accept(int &listening_fd)
+{
+    // accept
+    int linkage_fd;
+    sockaddr_in client_addr;
+    bzero(&client_addr, sizeof(client_addr));
+    int client_addr_len = sizeof(client_addr);
+    linkage_fd = accept(listening_fd, (struct sockaddr *)&client_addr, (socklen_t *)&client_addr_len);
+    if (linkage_fd < 0) {
+        printf ("When accept a linkage, there is a wrong. errno:%d\n", linkage_fd);
+        return -1;
+    }
+    printf ("accept a linkage [%d], ip[%s], port[%d]\n",
+            linkage_fd, inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+
+    return linkage_fd;
+}
+
+int select_accept(int &listening_fd, int (*write_message)(int), int (*read_message)(int))
+{
+    int max_fd = listening_fd;
+    fd_set rfds;
+    fd_set wfds;
+    int array_linkage_fd[1024];
+    for (int i = 0; i < 1024; i++) {
+        array_linkage_fd[i] = -1;
+    }
+    
+    while (1) {
+        FD_ZERO(&rfds);
+        FD_ZERO(&wfds);
+
+        // Add listening_fd
+        FD_SET(listening_fd, &rfds);
+
+        // Add array_linkage_fd
+        for (int i = 0; i < 1024; i++) {
+            if (array_linkage_fd[i] <= 0) {
+                continue;
+            }
+            FD_SET(array_linkage_fd[i], &rfds);
+            FD_SET(array_linkage_fd[i], &wfds);
+            if (array_linkage_fd[i] > max_fd) {
+                max_fd = array_linkage_fd[i];
+            }
+        }
+
+        int ret = select(max_fd + 1, &rfds, &wfds, NULL, NULL);
+        printf("SELECT return [%d].\n", ret);
+        if (ret == 0 || ret == -1) {
+            break;
+        }
+
+        // FD_ISSET listening_fd
+        if (FD_ISSET(listening_fd, &rfds)) {
+            int linkage_fd = one_accept(listening_fd);
+            add_fd(linkage_fd, array_linkage_fd, 1024);
+        }
+        
+        // FD_ISSET array_linkage_fd
+        for (int i = 0; i < 1024; i++) {
+            if (!FD_ISSET(array_linkage_fd[i], &rfds)) {
+                continue;
+            }
+            ret = read_message(array_linkage_fd[i]);
+            if (ret < 0) {
+                printf("read_message error ret=%d.\n", ret);
+            }
+        }
+        for (int i = 0; i < 1024; i++) {
+            if (!FD_ISSET(array_linkage_fd[i], &wfds)) {
+                continue;
+            }
+            int ret = write_message(array_linkage_fd[i]);
+            if (ret < 0) {
+                printf("write_message error ret=%d.\n", ret);
+            }
+        }
+    }
+    return 0;
+}
+
 /*
  * write_msg & read_msg is a sample protocol to transfer message
  * */
@@ -130,7 +230,7 @@ int write_string(int fd)
     size_t length = rpc::Rpc::GetMessageLength(msg);
     void *buffer = (void *)malloc(length);
     size_t length2 = rpc::Rpc::Serialize(buffer, msg);
-    ssize_t count = writen(fd, buffer, length2);
+    ssize_t count = ironman::serialize::writen(fd, buffer, length2);
     printf("write [%s] to fd[%d] "
             "GetMessageLength.length=%d, Serialize.length=%d, writen.length=%d\n",
             msg.c_str(), fd,
@@ -169,7 +269,7 @@ int read_string(int fd)
         buffer_used = buffer;
         memset(buffer_used + count_used, 0, buffer_length - count_used);
         ssize_t count;
-        count = readn(fd, buffer_used + count_used, buffer_length - count_used);
+        count = ironman::serialize::readn(fd, buffer_used + count_used, buffer_length - count_used);
         if (count == 0) {
             break;
         }

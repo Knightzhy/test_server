@@ -28,6 +28,23 @@ struct FuncData {
 };
 #pragma pack(pop)
 
+
+int sample_listen(int &listening_fd);
+
+int select_accept(int &listening_fd, int (*write_message)(int), int (*read_message)(int));
+int one_accept(int &listening_fd, int (*write_message)(int), int (*read_message)(int));
+int thread_accept(int &listening_fd, int (*write_message)(int), int (*read_message)(int));
+int process_accept(int &listening_fd, int (*write_message)(int), int (*read_message)(int));
+
+int write_char(int fd);
+int read_char(int fd);
+
+int write_string(int fd);
+int read_string(int fd);
+
+int write_message(int fd);
+int read_message(int fd);
+
 int set_nonblockint(int fd) {
     int flags;
     if ((flags = fcntl(fd, F_GETFL, 0))== -1){
@@ -200,6 +217,7 @@ int select_accept(int &listening_fd, int (*write_message)(int), int (*read_messa
             }
         }
     }
+    close(listening_fd);
     return 0;
 }
 
@@ -526,6 +544,14 @@ TEST(MESSAGE, PROCESS)
 }
 
 // SELECT
+TEST(CHAR, SELECT)
+{
+    int listening_fd;
+    int ret = sample_listen(listening_fd);
+    EXPECT_EQ(ret, 0);
+    ret = select_accept(listening_fd, write_char, read_char);
+    EXPECT_EQ(ret, 0);
+}
 // POLL
 // EPOLL
 // LIBEV

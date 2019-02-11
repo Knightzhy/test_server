@@ -30,12 +30,17 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-        signal(SIGINT, f);
-        signal(SIGFPE, f);
+        f(0);
         if(dlclose(dl_handle)!=0) {
             printf("dlclose error.\n");
             return 0;
         }
+        err = dlerror();
+        if (err != NULL) {
+            printf( "!!! %s\n", err);
+            return 0;
+        }
+
         sleep(1);
     }
 //    int b = 10 / 0;

@@ -7,6 +7,6 @@ void func(int no)
         printf("first.    ");
         count = 1;
     }
-    printf("xx\n");
+    printf("yyy\n");
     return;
 }

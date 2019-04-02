@@ -11,7 +11,6 @@ public:
     SmartPtr(const SmartPtr& ptr); // destructor
     void operator=(const SmartPtr& ptr);
     T operator*();
-    T& operator->();
     int GetCount();
     ~SmartPtr();
 };
@@ -54,12 +53,6 @@ template<class T>
 T SmartPtr<T>::operator*()
 {
     return *this->_ptr;
-}
-
-template<class T>
-T& SmartPtr<T>::operator->()
-{
-    return this->_ptr;
 }
 
 template<class T>
@@ -122,5 +115,14 @@ int main()
     std::cout << "c.count=" << c.GetCount() << std::endl;
     std::cout << "d.count=" << d.GetCount() << std::endl;
     std::cout << "===" << std::endl;
+
+    SmartPtr<int> *e = new SmartPtr<int>(c);
+    std::cout << "a.count=" << a.GetCount() << std::endl;
+    std::cout << "b.count=" << b.GetCount() << std::endl;
+    std::cout << "c.count=" << c.GetCount() << std::endl;
+    std::cout << "d.count=" << d.GetCount() << std::endl;
+    std::cout << "e.count=" << e->GetCount() << std::endl;
+    std::cout << "===" << std::endl;
+    delete e;
     return 0;
 }

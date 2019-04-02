@@ -10,7 +10,8 @@ public:
     SmartPtr(T *ptr = NULL); // constructor
     SmartPtr(const SmartPtr& ptr); // destructor
     void operator=(const SmartPtr& ptr);
-    T operator*();
+    T& operator*();
+    T& operator&();
     int GetCount();
     ~SmartPtr();
 };
@@ -50,9 +51,15 @@ void SmartPtr<T>::operator=(const SmartPtr& ptr)
 }
 
 template<class T>
-T SmartPtr<T>::operator*()
+T& SmartPtr<T>::operator*()
 {
     return *this->_ptr;
+}
+
+template<class T>
+T& SmartPtr<T>::operator&()
+{
+    return this->_ptr;
 }
 
 template<class T>

@@ -1,91 +1,96 @@
 #include <iostream>
 
 template<class T>
-class SmartPtr{
+class SmartPtr;
+
+template<class T>
+class Point{
+    friend class SmartPtr<T>;
 private:
     T* _ptr;
-    int* _count;
-    void SubCount();
-public:
-    SmartPtr(T *ptr = NULL); // constructor
-    SmartPtr(const SmartPtr& ptr); // destructor
-    void operator=(const SmartPtr& ptr);
-    T& operator*();
-    T& operator&();
-    int GetCount();
-    ~SmartPtr();
+    int _count;
+    Point(T*ptr) {
+        _ptr = ptr;
+        if (_ptr) {
+            _count = 1;
+        } else {
+            _count = 0;
+        }
+    }
+    ~Point() {
+        delete _ptr;
+        _ptr = NULL;
+    }
 };
 
 template<class T>
-SmartPtr<T>::SmartPtr(T *ptr) : _ptr(ptr)
+class SmartPtr {
+public:
+    SmartPtr(T* ptr);
+    SmartPtr(const SmartPtr& s);
+    SmartPtr& operator=(const SmartPtr<T>& s);
+    T* operator&();
+    T& operator*();
+    T* operator->();
+    int GetCount(){ return _p->_count;}
+    ~SmartPtr();
+private:
+    Point<T> *_p;
+};
+
+template<class T>
+SmartPtr<T>::SmartPtr(T* ptr = NULL) : _p(new Point<T>(ptr))
 {
-    if (_ptr) {
-        _count = new int(1);
-    } else {
-        _count = new int(0);
-    }
 }
 
 template<class T>
-SmartPtr<T>::SmartPtr(const SmartPtr& ptr)
+SmartPtr<T>::SmartPtr(const SmartPtr<T>& s)
 {
-    if (this != &ptr) {
-        this->_ptr = ptr._ptr;
-        this->_count = ptr._count;
-        (*this->_count)++;
-    }
+    _p = s._p;
+    _p->_count++;
 }
 
 template<class T>
-void SmartPtr<T>::operator=(const SmartPtr& ptr)
+SmartPtr<T>& SmartPtr<T>::operator=(const SmartPtr<T>& s)
 {
-    if (this->_ptr == ptr._ptr) {
-        return;
+    if (this !=&s) {
+        _p->_count--;
+        if (_p->_count == 0) {
+            delete _p;
+        }
+        _p = s._p;
+        _p->_count++;
     }
-    if (this->_ptr) {
-        this->SubCount();
-    }
-    this->_count = ptr._count;
-    this->_ptr = ptr._ptr;
-    (*this->_count)++;
+    return *this;
+}
+
+template<class T>
+T* SmartPtr<T>::operator&()
+{
+    return _p->_ptr;
+}
+
+template<class T>
+T* SmartPtr<T>::operator->()
+{
+    return _p->_ptr;
 }
 
 template<class T>
 T& SmartPtr<T>::operator*()
 {
-    return *this->_ptr;
-}
-
-template<class T>
-T& SmartPtr<T>::operator&()
-{
-    return this->_ptr;
+    return *(_p->_ptr);
 }
 
 template<class T>
 SmartPtr<T>::~SmartPtr()
 {
-    this->SubCount();
-}
-
-template<class T>
-void SmartPtr<T>::SubCount()
-{
-    (*this->_count)--;
-    if (*this->_count == 0) {
-        std::cout << "del ptr, " << *this->_ptr << std::endl;
-        delete this->_ptr;
-        delete this->_count;
-        this->_ptr = NULL;
-        this->_count = NULL;
+    _p->_count--;
+    if (_p->_count == 0) {
+        delete _p;
     }
 }
 
-template<class T>
-int SmartPtr<T>::GetCount()
-{
-    return *this->_count;
-}
 
 int main()
 {
@@ -133,13 +138,5 @@ int main()
     std::cout << "e.count=" << e->GetCount() << std::endl;
     std::cout << "===" << std::endl;
     delete e;
-
-    int *k = new int(13);
-    {
-        SmartPtr<int> f(k);
-        std::cout << "f.count=" << f.GetCount() << std::endl;
-    }
-    SmartPtr<int> g(k);
-    std::cout << "g.count=" << g.GetCount() << std::endl;
     return 0;
 }

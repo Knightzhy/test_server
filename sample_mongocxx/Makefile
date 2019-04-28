@@ -16,11 +16,8 @@ LIBRARIES = bsoncxx mongocxx
 PKGCONFIGS =
 
 BINPATH = thirdparty/staging/bin
-SEARCHPATH = thirdparty/staging/include \
-		 thirdparty/staging/include/bsoncxx/v_noabi \
-		 thirdparty/staging/include/mongocxx/v_noabi
-LIBRARYPATH = thirdparty/staging/lib \
-		  thirdparty/staging/lib64
+SEARCHPATH = thirdparty/staging/include
+LIBRARYPATH = thirdparty/staging/lib
 
 # Installing related
 DESTDIR =

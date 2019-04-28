@@ -49,7 +49,7 @@ int main(int, char**)
 
     mongocxx::database db = conn["runoob"];
     mongocxx::collection col = db["runoob"];
-    insert(col);
+ //   insert(col);
 
     print(col);
 

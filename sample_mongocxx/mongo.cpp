@@ -4,12 +4,14 @@
 
 #include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
+#include <mongocxx/pool.hpp>
 
 void print(mongocxx::collection &col)
 {
-    bsoncxx::stdx::optional<bsoncxx::document::value> res = col.find_one({});
-    if (res)
-        std::cout << bsoncxx::to_json(*res) << std::endl;
+    mongocxx::cursor cursor = col.find({});
+    for (auto doc :cursor) {
+        std::cout << bsoncxx::to_json(doc) << std::endl;
+    }
 }
 
 void insert(mongocxx::collection &col)
@@ -35,9 +37,16 @@ int main(int, char**)
 {
     mongocxx::instance inst{};
     //mongocxx::uri yace_uri{"mongodb://test_username:test_pwd@test_ip:test_port/?authSource=test_db"};
-    mongocxx::uri yace_uri{"mongodb://root:123456@172.16.16.6:27017"};
+    mongocxx::uri yace_uri{"mongodb://"};
+    mongocxx::pool p(yace_uri);
+    mongocxx::pool::entry e = p.acquire();
+    mongocxx::client &c = *e;
 
-    mongocxx::options::client client_options;
+    mongocxx::database db = c["runoob"];
+    mongocxx::collection col = db["runoob"];
+    print(col);
+    e = 0;
+    return 0;
     if (yace_uri.ssl()) {
         std::cout << "ssl-----------\n";
     }
@@ -47,16 +56,11 @@ int main(int, char**)
 
     mongocxx::client conn{yace_uri};
 
-    mongocxx::database db = conn["runoob"];
-    mongocxx::collection col = db["runoob"];
+    //mongocxx::database db = conn["runoob"];
+    //mongocxx::collection col = db["runoob"];
  //   insert(col);
 
     print(col);
 
     return 0;
 }
-
-/*
- *
-  g++ -o a test.cpp -I /home/knightwu/mongocxx/include/bsoncxx/v_noabi -I /home/knightwu/mongocxx/include/mongocxx/v_noabi -std=c++11 -L/home/knightwu/mongocxx/lib64 -lbsoncxx -lmongocxx
- * */

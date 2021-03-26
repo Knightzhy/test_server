@@ -101,7 +101,7 @@ int sample_listen(int &listening_fd)
     sockaddr_in server_addr;
     bzero(&server_addr, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(55555);
+    server_addr.sin_port = htons(9922);
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     ret = bind (listening_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
     if ( ret < 0 ) {

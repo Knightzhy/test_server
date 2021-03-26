@@ -65,10 +65,12 @@ int main ()
     int wait_fds;
     int cur_fds = 1;
     while (true) {
+        printf("epoll_waiting ....\n");
         if ( (wait_fds = epoll_wait(epoll_fd, evs, cur_fds, -1) )== -1) {
             printf ("epoll wait error, %d, %s.\n", errno, strerror(errno));
             return 0;
         }
+        printf("epoll_waited.\n");
         for (int i=0; i< wait_fds; i++) {
             if (evs[i].data.fd == listening_fd &&cur_fds < 1000) {
                 // accept
@@ -76,6 +78,7 @@ int main ()
                 sockaddr_in client_addr;
                 bzero(&client_addr, sizeof(client_addr));
                 int client_addr_len = sizeof(client_addr);
+                printf("accepting ....\n");
                 linkage_fd = accept(listening_fd, (struct sockaddr *)&client_addr, (socklen_t *)&client_addr_len);
                 if (linkage_fd < 0) {
                     printf ("When accept a linkage, there is a wrong. errno:%d\n", linkage_fd);

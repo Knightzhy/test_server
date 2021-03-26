@@ -22,12 +22,12 @@
 #include "ironman/serialize/rpc.h"
 #include "ironman/serialize/safe_io.h"
 
-/*
- * TODO
- * #include <sys/socket.h> 
- * int getsockname(int sockfd, struct sockaddr *localaddr, socklen_t *addrlen); 
- * int getpeername(int sockfd, struct sockaddr *peeraddr, socklen_t *addrlen);
- * */
+ /* 
+  * TODO
+  * #include <sys/socket.h> 
+  * int getsockname(int sockfd, struct sockaddr *localaddr, socklen_t *addrlen); 
+  * int getpeername(int sockfd, struct sockaddr *peeraddr, socklen_t *addrlen);
+  * */
 
 int set_nonblockint(int fd) {
     int flags;
@@ -51,7 +51,7 @@ int sample_connect(int &socket_fd)
     sockaddr_in server_addr;
     bzero(&server_addr, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(55555);
+    server_addr.sin_port = htons(9922);
     inet_pton(AF_INET, "0.0.0.0", &server_addr.sin_addr);
     int ret = connect(socket_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
     if (ret < 0) {

@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+package helloworld;
+
+// The request message containing the user's name.
+message HelloRequest {
+  optional string name = 1;
+}
+
+// The response message containing the greetings
+message HelloReply {
+  optional string address = 1;
+}
+

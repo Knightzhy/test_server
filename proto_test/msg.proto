@@ -1,0 +1,18 @@
+syntax = "proto2";
+package test;
+message AAA {
+    optional string aaa = 1;
+}
+enum StateType {
+  GOOD = 0;
+  BAD = 1;
+}
+message Content
+{
+  required int32  abc = 1;
+  required string def = 2;
+  optional int32  ghj = 3;
+  optional AAA jkl = 4;
+  repeated AAA qqq = 5;
+  optional StateType ppp = 6;
+}

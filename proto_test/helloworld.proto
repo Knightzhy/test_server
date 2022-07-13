@@ -1,0 +1,43 @@
+syntax = "proto2";
+
+package helloworld;
+
+import "google/protobuf/descriptor.proto";
+//import "xx.proto";
+message options{
+    optional string option_1 = 1;
+    optional int32 option_2 = 2;
+}
+
+extend google.protobuf.MessageOptions {
+      optional string my_option = 51234;
+      optional int32 my_option_1 = 51236;
+      optional options my_option_2 = 51237;
+}
+
+// The greeting service definition.
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply) {}
+  rpc SayWorld (HelloRequest) returns (HelloReply) {}
+  rpc SayGoodBye (HelloRequest) returns (HelloReply) {}
+}
+
+service Reder {
+  // Sends a greeting
+  rpc SayGod (HelloRequest) returns (HelloReply) {}
+}
+
+// The request message containing the user's name.
+message HelloRequest {
+    option (my_option) = "Hello Knightwu,wwwwwwwwwwwwwwwww";
+ //   option (xx.my_type) = "MKMKMKMK";
+    option (my_option_2).option_1 = "hello";
+  optional string name = 1[deprecated=true];
+}
+
+// The response message containing the greetings
+message HelloReply {
+  optional string message = 1;
+}
+

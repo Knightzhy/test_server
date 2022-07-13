@@ -1,0 +1,22 @@
+syntax = "proto2";
+package yy;
+
+message BaseMessage {
+    required uint64 server_id = 1;
+    required string uuid = 2;
+    required uint64 message_id = 3;
+
+    extensions 200 to max;
+}
+
+extend BaseMessage {
+    optional GetIdentifyReq get_indentify_req= 201;
+    optional GetIdentifyResp get_indentify_resp = 202;
+}
+
+message GetIdentifyReq {
+    required string hostname = 1;
+}
+message GetIdentifyResp {
+    required string ip = 1;
+}

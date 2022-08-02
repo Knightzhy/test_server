@@ -317,22 +317,19 @@ int read_string(int fd)
  * */
 int write_message(int fd)
 {
-    ironman::serialize::SampleHeader sample_header(56766, 1230, 118);
     ironman::serialize::StringPayload string_payload("Yes, it's me.");
-    ironman::serialize::Message message(98120, &sample_header, &string_payload);
+    ironman::serialize::Message message(98120, &string_payload);
     ironman::serialize::rpc::MessageFactory message_factory(&message);
     ironman::serialize::rpc::RpcBase rpc_base;
     int ret = rpc_base.Sended(fd, &message_factory);
     printf("Sended ret=%d.\n", ret);
-    sample_header.PrintOptions();
     string_payload.PrintMsg();
     return ret;
 }
 int read_message(int fd)
 {
-    ironman::serialize::SampleHeader sample_header;
     ironman::serialize::StringPayload string_payload;
-    ironman::serialize::Message message(98120, &sample_header, &string_payload);
+    ironman::serialize::Message message(98120, &string_payload);
     ironman::serialize::rpc::MessageFactory message_factory(&message);
     ironman::serialize::rpc::RpcBase rpc_base;
     int ret = rpc_base.Received(fd, &message_factory);

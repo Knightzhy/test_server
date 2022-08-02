@@ -4,13 +4,11 @@
 #include <unistd.h>
 #include <atomic>
 
-using namespace std;
-
-atomic<int64_t> count(0);
+std::atomic<int64_t> count(0);
 
 void output()
 {
-    cout << count << endl;
+    std::cout << count << std::endl;
 }
 
 void work()
@@ -23,7 +21,7 @@ void work()
 int main()
 {
     for (int i = 0; i < 1 ; i++) {
-        thread t(work);
+        std::thread t(work);
         t.detach();
     }
     sleep(1);
@@ -31,7 +29,7 @@ int main()
     // get count
     output();
 
-    sleep(9);
+    sleep(4);
 
     // get count
     output();

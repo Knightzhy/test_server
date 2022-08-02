@@ -8,7 +8,7 @@
 pthread_mutex_t m_mutex;
 
 struct member{
-    char* name;
+    std::string name;
     uint16_t age;
 };
 void *func(void* m)
@@ -18,7 +18,7 @@ void *func(void* m)
     sleep(8);
     printf("create thread id=%u\n", (uint32_t)pthread_self());
     member *a = (struct member*)m;
-    printf("m.name=%s, m.age=%d\n", a->name, a->age);
+    printf("m.name=%s, m.age=%d\n", a->name.c_str(), a->age);
     pthread_mutex_unlock(&m_mutex);
 
     return NULL;
@@ -36,7 +36,7 @@ int main()
     }
     a->name = "HH";
     a->age = 16;
-    printf("m.name=%s, m.age=%d\n", a->name, a->age);
+    printf("m.name=%s, m.age=%d\n", a->name.c_str(), a->age);
     pthread_mutex_init(&m_mutex, NULL);
     ret = pthread_create(&tid, NULL, func, a);
     printf("ret=%d, thread id=%u\n", ret, (uint32_t)pthread_self());

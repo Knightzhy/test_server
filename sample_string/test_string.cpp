@@ -26,9 +26,10 @@ TEST(ST, A)
             a, (unsigned int)strlen(a), (unsigned int)sizeof(a));
     a[1] = 'M';
     printf("str=%s\n", a);
-    strcpy(a, "NNNMMM");
+    strcpy(a, "NNNMMM"); // Segmentation fault
     // a = "DDD"; error, invalid array assignment
     printf("str=%s\n", a);
+    printf("HAHA\n");
 }
 
 TEST(ST, B)
@@ -112,8 +113,7 @@ TEST(ST, D)
 
 TEST(ST, E)
 {
-    char *a;
-    a = "ABC";
+    char *a = "ABC";
     // a[1] = 'E'; // Segmentation fault
     std::cout << "a.length" << strlen(a)
         << "    a.sizeof=" << sizeof(a)
@@ -352,7 +352,7 @@ TEST(ST, Q)
 TEST(ST, R)
 {
 struct msg{
-    char payload[];
+    char payload[100];
 };
     msg a;
     printf("sizeof=%d, sizeof=%d, strlen=%d\n", sizeof(msg), sizeof(a), strlen(a.payload));

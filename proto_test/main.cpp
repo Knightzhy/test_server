@@ -14,8 +14,5 @@ int main() {
   std::cout << c.has_jkl() << std::endl;
   std::cout << c.jkl().has_aaa() << std::endl;
   std::cout << ":" << c.jkl().aaa().empty() << std::endl;
-  if (10) {
-    std::cout << "PP:" << std::endl;
-  }
   return 0;
 }

@@ -1,5 +1,6 @@
 #ifndef __RPC_H__
 #define __RPC_H__
+#include <stdint.h>
 #include <string>
 
 namespace rpc{

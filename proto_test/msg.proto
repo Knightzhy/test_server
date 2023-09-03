@@ -1,4 +1,5 @@
 syntax = "proto2";
+import "test_server/proto_test/hehe.proto";
 package test;
 message AAA {
     optional string aaa = 1;
@@ -13,6 +14,6 @@ message Content
   required string def = 2;
   optional int32  ghj = 3;
   optional AAA jkl = 4;
-  repeated int32 qqq = 5;
+  repeated hehe.AAA qqq = 5;
   optional StateType ppp = 6;
 }

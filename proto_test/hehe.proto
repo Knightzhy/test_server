@@ -1,0 +1,5 @@
+syntax = "proto2";
+package hehe;
+message AAA {
+    optional string aaa = 1;
+}

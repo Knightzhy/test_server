@@ -6,5 +6,5 @@ cc_binary(
   deps = [
     "@com_google_googletest//:gtest_main",
   ],
-  copts = ["-std=c++11"],
+  copts = ["-std=c++17"],
 )

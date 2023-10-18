@@ -3,6 +3,8 @@ load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
 load("@rules_cc//cc:defs.bzl", "cc_proto_library")
 load("@rules_proto//proto:defs.bzl", "proto_library")
 
+###############
+
 proto_library(
     name = "hehe_proto",
     srcs = ["hehe.proto"],
@@ -14,6 +16,8 @@ cc_proto_library(
         ":hehe_proto"
     ],
 )
+
+###############
 
 proto_library(
     name = "msg_proto",
@@ -36,6 +40,8 @@ cc_binary(
     deps = [":msg_proto_cc"],
 )
 
+###############
+
 proto_library(
     name = "helloworld_proto",
     srcs = ["helloworld.proto"],
@@ -44,6 +50,7 @@ proto_library(
     ],
 )
 
+
 cc_proto_library(
     name = "helloworld_proto_cc",
     deps = [
@@ -51,28 +58,45 @@ cc_proto_library(
     ],
 )
 
-# cc_grpc_library(
-#     name = "helloworld_grpc_proto_cc",
-#     srcs = [":helloworld_proto_cc"],
-#     grpc_only = True,
-#     deps = [":helloworld_proto_cc"],
-# )
+cc_grpc_library(
+    name = "helloworld_grpc_proto_cc",
+    srcs = [
+        ":helloworld_proto",
+    ],
+    grpc_only = True,
+    deps = [
+        ":helloworld_proto_cc",
+        "@com_github_grpc_grpc//:grpc++",
+    ],
+)
 
-# cc_binary(
-#     name = "helloworld_server",
-#     srcs = ["helloworld_server.cpp"],
-#     deps = [
-#         "@com_github_grpc_grpc//:grpc++",
-#         "@com_github_grpc_grpc//:grpc++_reflection",
-#         ":helloworld_grpc_proto_cc",
-#     ],
-# )
+cc_binary(
+    name = "helloworld_server",
+    srcs = ["helloworld_server.cpp"],
+    deps = [
+        "@com_github_grpc_grpc//:grpc++",
+        ":helloworld_grpc_proto_cc",
+    ],
+    includes = [
+        "/home/knightwu/projects/third/grpc/include",
+    ],
+    copts = [
+        "-std=c++14",
+    ],
+)
+
+
+###############
 
 # cc_binary(
 #     name = "helloworld_client",
 #     srcs = ["helloworld_client.cpp"],
+#     defines = ["BAZEL_BUILD"],
 #     deps = [
 #         "@com_github_grpc_grpc//:grpc++",
-#         ":helloworld_grpc_proto_cc",
+#         # ":helloworld_grpc_proto_cc",
+#     ],
+#     includes = [
+#         "/home/knightwu/projects/third/protobuf/src",
 #     ],
 # )

@@ -66,7 +66,6 @@ cc_grpc_library(
     grpc_only = True,
     deps = [
         ":helloworld_proto_cc",
-        "@com_github_grpc_grpc//:grpc++",
     ],
 )
 
@@ -75,28 +74,27 @@ cc_binary(
     srcs = ["helloworld_server.cpp"],
     deps = [
         "@com_github_grpc_grpc//:grpc++",
+        "@com_github_grpc_grpc//:grpc++_reflection",
         ":helloworld_grpc_proto_cc",
     ],
-    includes = [
-        "/home/knightwu/projects/third/grpc/include",
-    ],
     copts = [
-        "-std=c++14",
+        "-std=c++17",
     ],
 )
 
 
 ###############
 
-# cc_binary(
-#     name = "helloworld_client",
-#     srcs = ["helloworld_client.cpp"],
-#     defines = ["BAZEL_BUILD"],
-#     deps = [
-#         "@com_github_grpc_grpc//:grpc++",
-#         # ":helloworld_grpc_proto_cc",
-#     ],
-#     includes = [
-#         "/home/knightwu/projects/third/protobuf/src",
-#     ],
-# )
+cc_binary(
+    name = "helloworld_client",
+    srcs = ["helloworld_client.cpp"],
+    defines = ["BAZEL_BUILD"],
+    deps = [
+        "@com_github_grpc_grpc//:grpc++",
+        "@com_github_grpc_grpc//:grpc++_reflection",
+        ":helloworld_grpc_proto_cc",
+    ],
+    copts = [
+        "-std=c++17",
+    ],
+)

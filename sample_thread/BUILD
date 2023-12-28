@@ -10,6 +10,5 @@ cc_binary(
 cc_binary(
   name = "test2",
   srcs = ["test_thread2.cpp"],
-  linkopts = ["-pthread"],
   copts = ["-std=c++11"],
 )
